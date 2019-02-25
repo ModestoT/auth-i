@@ -31,6 +31,24 @@ router.post('/register', async (req, res) => {
         console.log(error);
         res.status(500).json({ error: 'Unable to register the user' });
     }
+});
+
+router.post('/login', async (req, res) => {
+    let username = req.body.username;
+    let password = req.body.password;
+    try {
+        const user = await Users.findBy({ username });
+        
+        if(user && bcrypt.compareSync(password, user.password)){
+            res.status(200).json({ message: `Welcome ${user.username}!!`});
+        } else {
+            res.status(401).json({ error: 'Wrong login information' });
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Unable to login '});
+    }
 })
 
 function checkAuth (req, res, next) {
