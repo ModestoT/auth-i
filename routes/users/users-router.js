@@ -13,7 +13,7 @@ router.use(
       secret: 'nobody tosses a dwarf!',
       cookie: {
         maxAge: 1 * 24 * 60 * 60 * 1000,
-        secure: true, // only set cookies over https. Server will not send back a cookie over http.
+        secure: false, // only set cookies over https. Server will not send back a cookie over http.
       }, // 1 day in milliseconds
       httpOnly: true, // don't let JS code access cookies. Browser extensions run JS code on your browser!
       resave: false,
@@ -21,7 +21,7 @@ router.use(
     })
 );
 
-router.get('/users', checkAuth, async (req, res) => {
+router.get('/users', checkAuth, checkSession, async (req, res) => {
     try {
         const users = await Users.find();
 
@@ -36,7 +36,7 @@ router.get('/users', checkAuth, async (req, res) => {
 router.post('/register', async (req, res) => {
     try { 
         let newUser = req.body;
-        const hash = bcrypt.hashSync(req.body.password, 15);
+        const hash = bcrypt.hashSync(req.body.password, 12);
 
         newUser.password = hash;
 
@@ -77,5 +77,13 @@ function checkAuth (req, res, next) {
         res.status(401).json({ error: 'You are not Authorized to view this information' });
     }
 }
+
+function checkSession(req, res, next) {
+    if (req.session && req.session.name) {
+        next();
+    } else {
+      res.status(401).json({ message: 'you shall not pass!!' });
+    }
+  }
 
 module.exports = router;
