@@ -21,7 +21,7 @@ router.use(
     })
 );
 
-router.get('/users', checkAuth, checkSession, async (req, res) => {
+router.get('/users',  checkAuth, checkSession, async (req, res) => {
     try {
         const users = await Users.find();
 
@@ -66,6 +66,18 @@ router.post('/login', async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Unable to login '});
+    }
+})
+
+router.get('/logout', (req, res) => {
+    if(req.session){
+        req.session.destroy(err => {
+            if(err){
+                res.status(500).json({ error: 'Unable to logout' });
+            } else {
+                res.status(200).json({ message: 'Logged Out' });
+            }
+        })
     }
 })
 
