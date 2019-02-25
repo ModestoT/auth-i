@@ -2,18 +2,23 @@ const db = require('../../db/dbConfig');
 
 module.exports = {
     find,
-    add
+    add,
+    findById
 };
 
 function find() {
     return db('users').select('id', 'username', 'password');
 };
 
-function add(user) {
+async function add(user) {
+    const [id] = await db('users').insert(user);
+
+    return findById(id);
+}
+
+function findById(id) {
     return db('users')
-        .insert(user)
-        .then(user => {
-            console.log(user);
-        })
+        .where({ id })
+        .first();
 }
 

@@ -19,12 +19,13 @@ router.get('/users', checkAuth, async (req, res) => {
 
 router.post('/register', async (req, res) => {
     try { 
-        const newUser = await Users.add(req.body);
-        const hash = bcrypt.hashSync(user.password, 15);
+        let newUser = req.body;
+        const hash = bcrypt.hashSync(req.body.password, 15);
 
         newUser.password = hash;
 
-        res.status(201).json(newUser);
+        const user = await Users.add(newUser);
+        res.status(201).json(user);
 
     } catch (error) {
         console.log(error);
