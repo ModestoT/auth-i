@@ -1,7 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
+const KnexSessionStore = require('connect-session-knex')(session);
 
+const db = require('../../db/dbConfig.js');
 const Users = require('./usersModel.js');
 
 const router = express.Router();
@@ -12,12 +14,19 @@ router.use(
       name: 'notsession', // default is connect.sid
       secret: 'nobody tosses a dwarf!',
       cookie: {
-        maxAge: 1 * 24 * 60 * 60 * 1000,
+        maxAge: 1000 * 60 * 60 * 3,
         secure: false, // only set cookies over https. Server will not send back a cookie over http.
       }, // 1 day in milliseconds
       httpOnly: true, // don't let JS code access cookies. Browser extensions run JS code on your browser!
       resave: false,
       saveUninitialized: false,
+      store: new KnexSessionStore({
+        knex: db,
+        tablename: 'sessions',
+        sidfieldname: 'sid',
+        createtable: true,
+        clearInterval: 1000 * 60 * 60, // in ms
+      }),
     })
 );
 
@@ -68,7 +77,7 @@ router.post('/login', async (req, res) => {
         const user = await Users.findBy({ username });
         
         if(user && bcrypt.compareSync(password, user.password)){
-            req.session.name = user.id;
+            req.session.userId = user.id;
             let cookie = req.session.name;
             res.status(200).json({ message: `Welcome ${user.username}!!`, cookie });
         } else {
@@ -117,7 +126,7 @@ function checkAuth (req, res, next) {
 }
 
 function checkSession(req, res, next) {
-    if (req.session && req.session.name) {
+    if (req.session && req.session.userId) {
         next();
     } else {
       res.status(401).json({ message: 'you shall not pass!!' });
