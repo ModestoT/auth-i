@@ -11,12 +11,12 @@ const router = express.Router();
 // configure express-session middleware
 router.use(
     session({
-      name: 'notsession', // default is connect.sid
+      name: 'clevername', // default is connect.sid
       secret: 'nobody tosses a dwarf!',
       cookie: {
         maxAge: 1000 * 60 * 60 * 3,
         secure: false, // only set cookies over https. Server will not send back a cookie over http.
-      }, // 1 day in milliseconds
+      }, // 3 hours in milliseconds
       httpOnly: true, // don't let JS code access cookies. Browser extensions run JS code on your browser!
       resave: false,
       saveUninitialized: false,
@@ -25,7 +25,7 @@ router.use(
         tablename: 'sessions',
         sidfieldname: 'sid',
         createtable: true,
-        clearInterval: 1000 * 60 * 60, // in ms
+        clearInterval: 1000 * 60 * 60, // 1 hour in ms
       }),
     })
 );
@@ -66,7 +66,11 @@ router.post('/register', async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: 'Unable to register the user' });
+        if(error.errno === 19) {
+            res.status(401).json({ error: 'A user with that username already exist' });
+        } else { 
+            res.status(500).json({ error: 'Unable to register the user' });
+        }
     }
 });
 
