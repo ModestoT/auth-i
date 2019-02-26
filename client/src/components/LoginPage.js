@@ -1,10 +1,14 @@
 import React from 'react';
 import makeAxios from './axios-config';
 
+import '../App.css';
+
 class LoginPage extends React.Component {
     state = {
         username: '',
-        password: ''
+        password: '',
+        error:'',
+
     };
 
     login = e => {
@@ -13,12 +17,30 @@ class LoginPage extends React.Component {
 
         makeAxios()
             .post('login', user)
-            .then( res => console.log(res))
-            .catch( err => console.log(err));
+            .then( res => this.setState({ error: '', userId: res.data.cookie }))
+            .catch( err => this.setState({ error: 'Wrong login information' }));
     }
 
     handleInput = e => {
         this.setState({ [e.target.name] : e.target.value });
+
+        if( e.target.name === 'username' && e.target.value.length < 3){
+            this.setState({ usernameError: true })
+        } else {
+            this.setState({ usernameError: false });
+        }
+
+        if( e.target.name === 'password' && e.target.value.length < 8){
+            this.setState({ passwordError: true })
+        } else {
+            this.setState({ passwordError: false });
+        }
+    }
+
+    componentDidUpdate(){
+        if(this.state.userId){
+            this.props.history.push('/users')
+        } 
     }
 
     render(){
@@ -26,10 +48,13 @@ class LoginPage extends React.Component {
             <div className="login-wrapper">
                 <form>
                     <input type="text" name="username" placeholder="Username" value={this.state.username} onChange={this.handleInput}/>
-                    <input type="password" name="password" placeholder="Passowrd" value={this.state.password} onChange={this.handleInput}/>
+                    <p className={`warning ${this.state.usernameError ? "error" : null }`}>The username must be at least 3 characters long</p>
+                    <input type="password" name="password" placeholder="Password" value={this.state.password} onChange={this.handleInput}/>
+                    <p className={`warning ${this.state.passwordError ? "error" : null }`}>The Password must be at least 8 characters long</p>
                     <button onClick={this.login}>Login</button>
                     <button>Register</button>
                 </form>
+                <div>{this.state.error ? `${this.state.error}`: null}</div>
             </div>
         );
     }
