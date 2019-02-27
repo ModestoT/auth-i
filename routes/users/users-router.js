@@ -82,7 +82,7 @@ router.post('/login', async (req, res) => {
         
         if(user && bcrypt.compareSync(password, user.password)){
             req.session.userId = user.id;
-            let cookie = req.session.name;
+            let cookie = req.session.userId;
             res.status(200).json({ message: `Welcome ${user.username}!!`, cookie });
         } else {
             res.status(401).json({ error: 'Wrong login information' });
