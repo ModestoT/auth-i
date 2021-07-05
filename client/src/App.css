@@ -1,0 +1,53 @@
+.App {
+  text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+input {
+  padding: .5%;
+  width: 30%;
+  margin-bottom: 15px;
+}
+
+form p {
+  margin-top: 0;
+}
+
+button {
+  padding: .7% 2%;
+  background: cadetblue;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  margin-right: 2%;
+}
+
+.login {
+  margin-bottom: 10px;
+  background: deepskyblue;
+}
+
+.warning {
+  display: none;
+}
+
+.error-message {
+  display: block;
+  color: red;
+}
+
+.error {
+  display: block;
+  color: white;
+  background: red;
+  width: 9%;
+  padding: 2%;
+  position: relative;
+  left: 43.5%;
+}
